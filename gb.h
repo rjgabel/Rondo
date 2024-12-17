@@ -4,7 +4,7 @@
 #include "stdbool.h"
 #include "stdint.h"
 
-#define RONDO_BIG_ENDIAN (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define RONDO_BIG_ENDIAN 0
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -14,6 +14,8 @@ typedef int16_t s16;
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
+
+#define FRAME_RATE 59.7275005696058
 
 // Macro to define CPU register pairs
 #if RONDO_BIG_ENDIAN

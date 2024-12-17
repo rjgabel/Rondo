@@ -1,6 +1,8 @@
 #include "lcd.h"
 #include "stdio.h"
 
+u32 colors[4] = {0xFFFFFF, 0xAAAAAA, 0x555555, 0x000000};
+
 // tile_ids from 0x100 to 0x17F are used for BG/Window tiles in $9000–$97FF
 static u8 get_tile_pixel(GameBoy* gb, u16 tile_id, u8 x, u8 y) {
     u8 lsb = gb->vram[16 * tile_id + 2 * y];
@@ -26,8 +28,8 @@ static void render_pixel(GameBoy* gb, u8 x, u8 y) {
     u8 color = get_tile_pixel(gb, tile_id, x % 8, y % 8);
 
     // Set pixel in fbuf
-    u8* buff = gb->fbuf;
-    buff[x + SCREEN_WIDTH * y] = color;
+    u32* buff = gb->fbuf;
+    buff[x + SCREEN_WIDTH * y] = colors[color];
 }
 
 void lcd_cycle(GameBoy* gb) {

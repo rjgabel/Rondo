@@ -79,6 +79,8 @@ GameBoy* make_gb(u8* rom, size_t size) {
 
     gb->lcd_en = true;
 
+    gb->fbuf = crit_alloc(SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(u32));
+
     return gb;
 }
 
