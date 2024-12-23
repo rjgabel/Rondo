@@ -3,11 +3,16 @@
 
 GameBoy* gb;
 
+static retro_environment_t environ_cb;
 static retro_video_refresh_t video_cb;
+static retro_input_poll_t input_poll_cb;
+static retro_input_state_t input_state_cb;
 
 void retro_set_environment(retro_environment_t cb) {
-    enum retro_pixel_format format = RETRO_PIXEL_FORMAT_XRGB8888;
+    static enum retro_pixel_format format = RETRO_PIXEL_FORMAT_XRGB8888;
     cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &format);
+
+    environ_cb = cb;
 }
 
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
@@ -16,9 +21,9 @@ void retro_set_audio_sample(retro_audio_sample_t cb) {}
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) {}
 
-void retro_set_input_poll(retro_input_poll_t cb) {}
+void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 
-void retro_set_input_state(retro_input_state_t cb) {}
+void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 void retro_init(void) {}
 
@@ -49,7 +54,28 @@ void retro_set_controller_port_device(unsigned port, unsigned device) {}
 
 void retro_reset(void) {}
 
+static void update_input() {
+    input_poll_cb();
+
+    static const unsigned buttons[8] = {
+        RETRO_DEVICE_ID_JOYPAD_RIGHT,  RETRO_DEVICE_ID_JOYPAD_LEFT,
+        RETRO_DEVICE_ID_JOYPAD_UP,     RETRO_DEVICE_ID_JOYPAD_DOWN,
+        RETRO_DEVICE_ID_JOYPAD_A,      RETRO_DEVICE_ID_JOYPAD_B,
+        RETRO_DEVICE_ID_JOYPAD_SELECT, RETRO_DEVICE_ID_JOYPAD_START};
+    u8 input = 0;
+    for (size_t i = 0; i < 8; i++) {
+        if (input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, buttons[i])) {
+            input |= (1 << i);
+        }
+    }
+
+    // We need to invert the input since gameboy treats 0 as pressed and 1 as
+    // not pressed
+    gb->input = ~input;
+}
+
 void retro_run(void) {
+    update_input();
     run_frame(gb);
 
     video_cb(gb->fbuf, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH * sizeof(u32));
@@ -66,6 +92,12 @@ void retro_cheat_reset(void) {}
 void retro_cheat_set(unsigned index, bool enabled, const char* code) {}
 
 bool retro_load_game(const struct retro_game_info* game) {
+    static const struct retro_controller_description controller = {
+        "Game Boy", RETRO_DEVICE_JOYPAD};
+    static const struct retro_controller_info ports[] = {{&controller, 1}, {0}};
+    // libretro.h says we should call this in retro_load_game
+    environ_cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, ports);
+
     gb = make_gb(game->data, game->size);
     if (!gb) {
         return false;

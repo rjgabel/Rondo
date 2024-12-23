@@ -77,6 +77,8 @@ GameBoy* make_gb(u8* rom, size_t size) {
 
     gb->ime = false;
 
+    gb->p1_get_btn = gb->p1_get_dpad = false;
+
     gb->lcd_en = true;
 
     gb->fbuf = crit_alloc(SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(u32));
@@ -114,7 +116,8 @@ u8 io_read(GameBoy* gb, u16 addr) {
 
     switch (addr) {
     case 0x00: // P1 (FF00)
-        return 0xFF;
+        return (gb->p1_get_dpad ? gb->input & 0xF : 0xF) &&
+               (gb->p1_get_btn ? gb->input >> 4 : 0xF);
     case 0x01: // SB (FF01)
         return gb->sb;
     case 0x02: // SC (FF02)
@@ -164,40 +167,6 @@ u8 io_read(GameBoy* gb, u16 addr) {
     }
 }
 
-u8 read(GameBoy* gb, u16 addr) {
-    if (addr < 0x8000) {
-        // 0x0000 - 0x7FFF (ROM)
-        u8* ptr = (addr & 0x4000) ? gb->rom_hi : gb->rom_lo;
-        return ptr ? ptr[addr & 0x3FFF] : 0xFF;
-    } else if (addr < 0xA000) {
-        // 0x8000 - 0x9FFF (VRAM)
-        return gb->vram[addr % 0x2000];
-    } else if (addr < 0xC000) {
-        // 0xA000 - 0xBFFF (External RAM)
-        // TODO: implement external RAM
-        return 0xFF;
-    } else if (addr < 0xFE00) {
-        // 0xC000 - 0xFDFF (WRAM)
-        // Designed to account for echo RAM
-        u8* ptr = (addr & 0x1000) ? gb->wram_hi : gb->wram_lo;
-        return ptr[addr & 0x0FFF];
-    } else if (addr < 0xFEA0) {
-        // 0xFE00 - 0xFE9F (OAM)
-        return gb->oam[addr & 0xFF];
-    } else if (addr < 0xFF00) {
-        // 0xFEA0 - 0xFEFF (unused)
-        return 0xFF;
-    } else if (addr < 0xFF80) {
-        // 0xFF00 - 0xFF7F (IO)
-        return io_read(gb, addr);
-    } else if (addr < 0xFFFF) {
-        // 0xFF80 - 0xFFFE (HRAM)
-        return gb->hram[addr & 0x7F];
-    } else {
-        return gb->ie;
-    }
-}
-
 void io_write(GameBoy* gb, u16 addr, u8 data) {
     addr &= 0x7F;
 
@@ -208,6 +177,8 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
 
     switch (addr) {
     case 0x00: // P1 (FF00)
+        gb->p1_get_dpad = !(data & (1 << 4));
+        gb->p1_get_btn = !(data & (1 << 5));
         break;
     case 0x01: // SB (FF01)
         gb->sb = data;
@@ -289,6 +260,40 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         printf("Unimplemented write %x at IO address %x\n", (int)data,
                (int)addr);
         exit(1);
+    }
+}
+
+u8 read(GameBoy* gb, u16 addr) {
+    if (addr < 0x8000) {
+        // 0x0000 - 0x7FFF (ROM)
+        u8* ptr = (addr & 0x4000) ? gb->rom_hi : gb->rom_lo;
+        return ptr ? ptr[addr & 0x3FFF] : 0xFF;
+    } else if (addr < 0xA000) {
+        // 0x8000 - 0x9FFF (VRAM)
+        return gb->vram[addr % 0x2000];
+    } else if (addr < 0xC000) {
+        // 0xA000 - 0xBFFF (External RAM)
+        // TODO: implement external RAM
+        return 0xFF;
+    } else if (addr < 0xFE00) {
+        // 0xC000 - 0xFDFF (WRAM)
+        // Designed to account for echo RAM
+        u8* ptr = (addr & 0x1000) ? gb->wram_hi : gb->wram_lo;
+        return ptr[addr & 0x0FFF];
+    } else if (addr < 0xFEA0) {
+        // 0xFE00 - 0xFE9F (OAM)
+        return gb->oam[addr & 0xFF];
+    } else if (addr < 0xFF00) {
+        // 0xFEA0 - 0xFEFF (unused)
+        return 0xFF;
+    } else if (addr < 0xFF80) {
+        // 0xFF00 - 0xFF7F (IO)
+        return io_read(gb, addr);
+    } else if (addr < 0xFFFF) {
+        // 0xFF80 - 0xFFFE (HRAM)
+        return gb->hram[addr & 0x7F];
+    } else {
+        return gb->ie;
     }
 }
 

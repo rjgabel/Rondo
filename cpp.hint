@@ -9,3 +9,6 @@
 #define RETRO_API
 #define REG_DEF(HI, LO) union { u16 HI##LO; struct { u8 HI, LO; }; };
 #define REG_DEF(HI, LO) union { u16 HI##LO; struct { u8 LO, HI; }; };
+#define POP_RR(RR) static void pop_##RR(GameBoy* gb) { gb->RR = pop_cycle16(gb); }
+#define DEF_ALL_REG16(MACRO) MACRO(bc) MACRO(de) MACRO(hl)
+#define RETRO_DEVICE_ID_JOYPAD_RIGHT

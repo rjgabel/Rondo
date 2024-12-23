@@ -71,6 +71,11 @@ typedef struct {
 
     bool ime;
 
+    // FF00 (joypad/P1)
+    u8 input; // d-pad in the low nibble, buttons in the high
+    bool p1_get_dpad;
+    bool p1_get_btn;
+
     u8 sb; // FF01
     u8 sc; // FF02
 
