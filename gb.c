@@ -116,7 +116,7 @@ u8 io_read(GameBoy* gb, u16 addr) {
 
     switch (addr) {
     case 0x00: // P1 (FF00)
-        return (gb->p1_get_dpad ? gb->input & 0xF : 0xF) &&
+        return (gb->p1_get_dpad ? gb->input & 0xF : 0xF) &
                (gb->p1_get_btn ? gb->input >> 4 : 0xF);
     case 0x01: // SB (FF01)
         return gb->sb;

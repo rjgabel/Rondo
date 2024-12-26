@@ -25,3 +25,4 @@
 #define DEC_RR(RR) static void dec_##RR(GameBoy* gb) { gb->RR--; cycle(gb); }
 #define DEF_BIT_REG(OP, B) OP(B, a) OP(B, b) OP(B, c) OP(B, d) OP(B, e) OP(B, h) OP(B, l)
 #define JP_CC_NN(CC, COND) static void jp_##CC##_nn(GameBoy* gb) { u16 nn = read_imm_cycle16(gb); if (COND) { gb->pc = nn; cycle(gb); } }
+#define RST_N(N) static void rst_##N(GameBoy* gb) { push_cycle16(gb, gb->pc); gb->pc = N; }

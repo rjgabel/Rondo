@@ -295,7 +295,7 @@ DEF_ALU_OP(sbc)
 DEF_ALU_OP(cp)
 DEF_ALU_OP(and)
 DEF_ALU_OP(or)
-DEF_ALU_OP (xor)
+DEF_ALU_OP(xor)
 
 // INC r
 #define INC_R(R)                                                               \
