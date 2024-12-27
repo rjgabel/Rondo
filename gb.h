@@ -17,6 +17,8 @@ typedef int16_t s16;
 
 #define FRAME_RATE 59.7275005696058
 
+#define OAM_COUNT 40
+
 // Macro to define CPU register pairs
 #if RONDO_BIG_ENDIAN
 #define REG_DEF(HI, LO)                                                        \
@@ -106,7 +108,6 @@ typedef struct {
     u8 scx;     // FF43
     u8 ly;      // FF44
     u8 lyc;     // FF45
-    u8 dma;     // FF46
     u8 bgp[4];  // FF47
     u8 obp0[4]; // FF48
     u8 obp1[4]; // FF49

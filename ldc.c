@@ -4,6 +4,7 @@
 u32 colors[4] = {0xFFFFFF, 0xAAAAAA, 0x555555, 0x000000};
 
 // tile_ids from 0x100 to 0x17F are used for BG/Window tiles in $9000–$97FF
+// x and y should be in the range [0,7]
 static u8 get_tile_pixel(GameBoy* gb, u16 tile_id, u8 x, u8 y) {
     u8 lsb = gb->vram[16 * tile_id + 2 * y];
     u8 msb = gb->vram[16 * tile_id + 2 * y + 1];
@@ -19,17 +20,38 @@ static u8 get_bg_tile(GameBoy* gb, u8 x, u8 y, bool is_win) {
     return tile_map[y * 32 + x];
 }
 
-static void render_pixel(GameBoy* gb, u8 x, u8 y) {
-    // Background/Window
+// Get background/window pixel
+static u8 get_bg_pixel(GameBoy* gb, u8 x, u8 y) {
     u16 tile_id = get_bg_tile(gb, x / 8, y / 8, false);
     if (!gb->tile_sel && (tile_id < 0x80)) {
         tile_id += 0x100;
     }
-    u8 color = get_tile_pixel(gb, tile_id, x % 8, y % 8);
+    return get_tile_pixel(gb, tile_id, x % 8, y % 8);
+}
+
+static u8 get_obj_pixel(GameBoy* gb, u8 x, u8 y) {
+    // Objects
+    for (size_t i = 0; i < OAM_COUNT; i++) {
+        u8* obj = &gb->oam[i * 4];
+        u8 obj_x = x - obj[1] + 8;
+        u8 obj_y = y - obj[0] + 16;
+
+        if (obj_x < 8 && obj_y < 8) {
+            return get_tile_pixel(gb, obj[2], obj_x, obj_y);
+        }
+    }
+    return 0;
+}
+
+static void render_pixel(GameBoy* gb, u8 x, u8 y) {
+    u8 bg_pixel = get_bg_pixel(gb, x, y);
+    u8 obj_pixel = get_obj_pixel(gb, x, y);
+
+    u8 pixel = bg_pixel ? bg_pixel : obj_pixel;
 
     // Set pixel in fbuf
     u32* buff = gb->fbuf;
-    buff[x + SCREEN_WIDTH * y] = colors[color];
+    buff[x + SCREEN_WIDTH * y] = colors[pixel];
 }
 
 void lcd_cycle(GameBoy* gb) {

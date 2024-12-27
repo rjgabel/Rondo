@@ -147,7 +147,7 @@ u8 io_read(GameBoy* gb, u16 addr) {
     case 0x45: // LYC (FF45)
         return gb->lyc;
     case 0x46: // DMA (FF46)
-        return gb->dma;
+        return 0xFF;
     case 0x47: // BGP (FF47)
         return (gb->bgp[0] << 0) | (gb->bgp[1] << 2) | (gb->bgp[2] << 4) |
                (gb->bgp[3] << 6);
@@ -227,7 +227,9 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->lyc = data;
         break;
     case 0x46: // DMA (FF46)
-        gb->dma = data;
+        for (u8 i = 0; i < 0xA0; i++) {
+            gb->oam[i] = read(gb, (data << 8) + i);
+        }
         break;
     case 0x47: // BGP (FF47)
         gb->bgp[0] = (data >> 0) & 0x3;
