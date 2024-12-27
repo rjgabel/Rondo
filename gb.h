@@ -91,6 +91,88 @@ typedef struct GameBoy {
 
     u8 if_; // FF0F
 
+    // Audio stuff
+
+    // Channel 1
+    bool ch1_dac;
+    // AUD1SWEEP/NR10 (FF10)
+    u8 ch1_sweep_time;  // Bits 4-6
+    bool ch1_sweep_dir; // Bit 3
+    u8 ch1_sweep_shift; // Bits 0-2
+    // AUD1LEN/NR11 (FF11)
+    u8 ch1_duty; // Bits 6-7
+    u8 ch1_len;  // Bits 0-5 (inverted)
+    // AUD1ENV/NR12 (FF12)
+    u8 ch1_env_init;  // Bits 4-7
+    bool ch1_env_dir; // Bit 3
+    u8 ch1_env_sweep; // Bits 0-2
+    // AUD1LOW/NR13 (FF13)
+    // AUD1HIGH/NR14 (FF14)
+    u16 ch1_period;  // NR13 bits 0-7, NR14 bits 0-2 (inverted)
+    bool ch1_active; // NR14 bit 7
+    bool ch1_len_en; // NR14 bit 6
+
+    // Channel 2
+    bool ch2_dac;
+    // AUD2LEN/NR21 (FF16)
+    u8 ch2_duty; // Bits 6-7
+    u8 ch2_len;  // Bits 0-5 (inverted)
+    // AUD2ENV/NR22 (FF17)
+    u8 ch2_env_init;  // Bits 4-7
+    bool ch2_env_dir; // Bit 3
+    u8 ch2_env_sweep; // Bits 0-2
+    // AUD2LOW/NR23 (FF18)
+    // AUD2HIGH/NR24 (FF19)
+    u16 ch2_period;  // NR23 bits 0-7, NR24 bits 0-2 (inverted)
+    bool ch2_active; // NR24 bit 7
+    bool ch2_len_en; // NR24 bit 6
+
+    // Channel 3
+    // AUD3ENA/NR30 (FF1A)
+    bool ch3_dac; // Bit 7
+    // AUD3LEN/NR31 (FF1B)
+    u8 ch3_len; // Bits 0-7 (inverted)
+    // AUD3LEVEL/NR32 (FF1C)
+    u8 ch3_vol; // Bits 5-6
+    // AUD3LOW/NR33 (FF1D)
+    // AUD3HIGH/NR34 (FF1E)
+    u16 ch3_period;  // NR33 bits 0-7, NR34 bits 0-2 (inverted)
+    bool ch3_active; // NR34 bit 7
+    bool ch3_len_en; // NR34 bit 6
+
+    // Channel 4
+    bool ch4_dac;
+    // AUD4LEN/NR41 (FF20)
+    u8 ch4_len; // Bits 0-5 (inverted)
+    // AUD4ENV/NR42 (FF21)
+    u8 ch4_env_init;  // Bits 4-7
+    bool ch4_env_dir; // Bit 3
+    u8 ch4_env_sweep; // Bits 0-2
+    // AUD4POLY/NR43 (FF22)
+    u8 ch4_shift;   // Bits 4-7
+    bool ch4_width; // Bit 3
+    u8 ch4_divider; // Bits 0-2
+    // AUD4GO/NR44 (FF23)
+    bool ch4_active; // Bit 7
+    bool ch4_len_en; // Bit 6
+
+    // AUDVOL/NR50 (FF24)
+    u8 vol_l; // Bits 4-6
+    u8 vol_r; // Bits 0-2
+
+    // AUDTERM/NR51 (FF25)
+    bool ch4_l; // Bit 7
+    bool ch3_l; // Bit 6
+    bool ch2_l; // Bit 5
+    bool ch1_l; // Bit 4
+    bool ch4_r; // Bit 3
+    bool ch3_r; // Bit 2
+    bool ch2_r; // Bit 1
+    bool ch1_r; // Bit 0
+
+    // AUDENA/NR52 (FF26)
+    bool apu_on; // Bit 7
+
     // LCDC (FF40)
     bool lcd_en;   // Bit 7
     bool win_map;  // Bit 6
