@@ -508,7 +508,6 @@ void write(GameBoy* gb, u16 addr, u8 data) {
 }
 
 void cycle(GameBoy* gb) {
-    gb->cycles += 2;
     if (gb->lcd_en) {
         for (int i = 0; i < 4; i++) {
             lcd_cycle(gb);

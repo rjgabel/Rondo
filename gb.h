@@ -132,6 +132,8 @@ typedef struct GameBoy {
     bool ch2_len_en; // NR24 bit 6
 
     // Channel 3
+    u16 ch3_timer;
+    u8 ch3_index;
     bool ch3_dac; // AUD3ENA/NR30 (FF1A), Bit 7
     bool ch3_active;
     // AUD3LEN/NR31 (FF1B)
@@ -204,8 +206,6 @@ typedef struct GameBoy {
 
     u8 ie; // FFFF
 
-    // Internal stuff
-    u32 cycles;
     // Ranges from -80 to 375 on each scanline
     s16 dots;
 } GameBoy;
