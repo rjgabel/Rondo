@@ -215,8 +215,9 @@ static inline void alu_add(GameBoy* gb, u8 data) {
 
 static inline void alu_adc(GameBoy* gb, u8 data) {
     gb->f_h = (gb->a & 0xF) + (data & 0xF) + gb->f_c > 0xF;
-    gb->f_c = gb->a + data + gb->f_c > 0xFF;
+    bool new_c = gb->a + data + gb->f_c > 0xFF;
     gb->a += data + gb->f_c;
+    gb->f_c = new_c;
     gb->f_z = !gb->a;
     gb->f_n = 0;
 }
@@ -231,8 +232,9 @@ static inline void alu_sub(GameBoy* gb, u8 data) {
 
 static inline void alu_sbc(GameBoy* gb, u8 data) {
     gb->f_h = (gb->a & 0xF) < (data & 0xF) + gb->f_c;
-    gb->f_c = gb->a < data + gb->f_c;
+    bool new_c = gb->a < data + gb->f_c;
     gb->a -= data + gb->f_c;
+    gb->f_c = new_c;
     gb->f_z = !gb->a;
     gb->f_n = 1;
 }
@@ -384,7 +386,7 @@ DEC_RR(sp)
 #define ADD_HL_RR(RR)                                                          \
     static void add_hl_##RR(GameBoy* gb) {                                     \
         gb->f_h = (gb->hl & 0xFFF) + (gb->RR & 0xFFF) > 0xFFF;                 \
-        gb->f_c = gb->hl + gb->RR > 0xFFF;                                     \
+        gb->f_c = gb->hl + gb->RR > 0xFFFF;                                    \
         gb->hl += gb->RR;                                                      \
         gb->f_n = 0;                                                           \
         cycle(gb);                                                             \
@@ -479,7 +481,7 @@ static inline u8 cb_sla(GameBoy* gb, u8 data) {
 
 static inline u8 cb_sra(GameBoy* gb, u8 data) {
     gb->f_c = data & 0x01;
-    data = (data > 1) + (data & 0x80);
+    data = (data >> 1) + (data & 0x80);
     gb->f_z = !data;
     gb->f_n = gb->f_h = 0;
     return data;
