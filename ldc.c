@@ -47,7 +47,7 @@ static void render_pixel(GameBoy* gb, u8 x, u8 y) {
     u8 bg_pixel = get_bg_pixel(gb, x, y);
     u8 obj_pixel = get_obj_pixel(gb, x, y);
 
-    u8 pixel = bg_pixel ? bg_pixel : obj_pixel;
+    u8 pixel = obj_pixel ? obj_pixel : bg_pixel;
 
     // Set pixel in fbuf
     u32* buff = gb->fbuf;
