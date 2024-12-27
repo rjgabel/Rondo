@@ -270,14 +270,22 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->ch1_env_init = GET_BITS(data, 4, 7);
         gb->ch1_env_dir = GET_BIT(data, 3);
         gb->ch1_env_sweep = GET_BITS(data, 0, 2);
+        if (data & 0xF8) {
+            gb->ch1_dac = true;
+        } else {
+            gb->ch1_dac = false;
+            gb->ch1_active = false;
+        }
         break;
     case 0x13: // AUD1LOW/NR13 (FF13)
         gb->ch1_period = (gb->ch1_period & 0x700) | ~data;
         break;
     case 0x14: // AUD1HIGH/NR14 (FF14)
-        gb->ch1_active = GET_BIT(data, 7);
         gb->ch1_len_en = GET_BIT(data, 6);
         gb->ch1_period = (gb->ch1_period & 0xFF) | GET_BITS(~data, 0, 2) << 8;
+        if (data & 0x80) {
+            ch1_trigger(gb);
+        }
         break;
     case 0x16: // AUD2LEN/NR21 (FF16)
         gb->ch2_duty = GET_BITS(data, 6, 7);
@@ -287,17 +295,30 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->ch2_env_init = GET_BITS(data, 4, 7);
         gb->ch2_env_dir = GET_BIT(data, 3);
         gb->ch2_env_sweep = GET_BITS(data, 0, 2);
+        if (data & 0xF8) {
+            gb->ch2_dac = true;
+        } else {
+            gb->ch2_dac = false;
+            gb->ch2_active = false;
+        }
         break;
     case 0x18: // AUD2LOW/NR23 (FF18)
         gb->ch2_period = (gb->ch2_period & 0x700) | ~data;
         break;
     case 0x19: // AUD2HIGH/NR24 (FF19)
-        gb->ch2_active = GET_BIT(data, 7);
         gb->ch2_len_en = GET_BIT(data, 6);
         gb->ch2_period = (gb->ch2_period & 0xFF) | GET_BITS(~data, 0, 2) << 8;
+        if (data & 0x80) {
+            ch2_trigger(gb);
+        }
         break;
     case 0x1A: // AUD3ENA/NR30 (FF1A)
-        gb->ch3_dac = GET_BIT(data, 7);
+        if (data & 0x80) {
+            gb->ch3_dac = true;
+        } else {
+            gb->ch3_dac = false;
+            gb->ch3_active = false;
+        }
         break;
     case 0x1B: // AUD3LEN/NR31 (FF1B)
         gb->ch3_len = ~data;
@@ -312,6 +333,9 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->ch3_active = GET_BIT(data, 7);
         gb->ch3_len_en = GET_BIT(data, 6);
         gb->ch3_period = (gb->ch3_period & 0xFF) | GET_BITS(~data, 0, 2) << 8;
+        if (data & 0x80) {
+            ch3_trigger(gb);
+        }
         break;
     case 0x20: // AUD4LEN/NR41 (FF20)
         gb->ch4_len = (data & 0x3F) ^ 0x3F;
@@ -320,6 +344,12 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->ch4_env_init = GET_BITS(data, 4, 7);
         gb->ch4_env_dir = GET_BIT(data, 3);
         gb->ch4_env_sweep = GET_BITS(data, 0, 2);
+        if (data & 0xF8) {
+            gb->ch4_dac = true;
+        } else {
+            gb->ch4_dac = false;
+            gb->ch4_active = false;
+        }
         break;
     case 0x22: // AUD4POLY/NR43 (FF22)
         gb->ch4_shift = GET_BITS(data, 4, 7);
@@ -327,8 +357,10 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->ch4_divider = GET_BITS(data, 0, 2);
         break;
     case 0x23: // AUD4GO/NR44 (FF23)
-        gb->ch4_active = GET_BIT(data, 7);
         gb->ch4_len_en = GET_BIT(data, 6);
+        if (data & 0x80) {
+            ch4_trigger(gb);
+        }
         break;
     case 0x24: // AUDVOL/NR50 (FF24)
         gb->vol_l = GET_BITS(data, 4, 6);

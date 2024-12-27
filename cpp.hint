@@ -34,3 +34,4 @@
 #define LD_HL_R(R) static void ld_hl_##R(GameBoy* gb) { write_cycle(gb, gb->hl, gb->R); }
 #define DEC_R(R) static void dec_##R(GameBoy* gb) { gb->R--; gb->f_z = !gb->R; gb->f_n = 1; gb->f_h = (gb->R & 0xF) == 0xF; }
 #define bool
+#define GET_BIT(value, b) ((value) >> (b) & 1)

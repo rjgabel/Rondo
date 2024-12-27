@@ -97,6 +97,7 @@ typedef struct GameBoy {
     u16 ch1_timer;
     u8 ch1_index;
     bool ch1_dac;
+    bool ch1_active;
     // AUD1SWEEP/NR10 (FF10)
     u8 ch1_sweep_time;  // Bits 4-6
     bool ch1_sweep_dir; // Bit 3
@@ -111,13 +112,13 @@ typedef struct GameBoy {
     // AUD1LOW/NR13 (FF13)
     // AUD1HIGH/NR14 (FF14)
     u16 ch1_period;  // NR13 bits 0-7, NR14 bits 0-2 (inverted)
-    bool ch1_active; // NR14 bit 7
     bool ch1_len_en; // NR14 bit 6
 
     // Channel 2
     u16 ch2_timer;
     u8 ch2_index;
     bool ch2_dac;
+    bool ch2_active;
     // AUD2LEN/NR21 (FF16)
     u8 ch2_duty; // Bits 6-7
     u8 ch2_len;  // Bits 0-5 (inverted)
@@ -128,12 +129,11 @@ typedef struct GameBoy {
     // AUD2LOW/NR23 (FF18)
     // AUD2HIGH/NR24 (FF19)
     u16 ch2_period;  // NR23 bits 0-7, NR24 bits 0-2 (inverted)
-    bool ch2_active; // NR24 bit 7
     bool ch2_len_en; // NR24 bit 6
 
     // Channel 3
-    // AUD3ENA/NR30 (FF1A)
-    bool ch3_dac; // Bit 7
+    bool ch3_dac; // AUD3ENA/NR30 (FF1A), Bit 7
+    bool ch3_active;
     // AUD3LEN/NR31 (FF1B)
     u8 ch3_len; // Bits 0-7 (inverted)
     // AUD3LEVEL/NR32 (FF1C)
@@ -141,11 +141,11 @@ typedef struct GameBoy {
     // AUD3LOW/NR33 (FF1D)
     // AUD3HIGH/NR34 (FF1E)
     u16 ch3_period;  // NR33 bits 0-7, NR34 bits 0-2 (inverted)
-    bool ch3_active; // NR34 bit 7
     bool ch3_len_en; // NR34 bit 6
 
     // Channel 4
     bool ch4_dac;
+    bool ch4_active;
     // AUD4LEN/NR41 (FF20)
     u8 ch4_len; // Bits 0-5 (inverted)
     // AUD4ENV/NR42 (FF21)
@@ -157,7 +157,6 @@ typedef struct GameBoy {
     bool ch4_width; // Bit 3
     u8 ch4_divider; // Bits 0-2
     // AUD4GO/NR44 (FF23)
-    bool ch4_active; // Bit 7
     bool ch4_len_en; // Bit 6
 
     // AUDVOL/NR50 (FF24)
