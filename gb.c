@@ -209,6 +209,9 @@ u8 io_read(GameBoy* gb, u16 addr) {
     }
 }
 
+#define GET_BITS(value, lo, hi) ((value) >> (lo) & (1 << (hi) - (lo) + 1) - 1)
+#define GET_BIT(value, b) ((value) >> (b) & 1)
+
 void io_write(GameBoy* gb, u16 addr, u8 data) {
     addr &= 0x7F;
 
@@ -243,6 +246,96 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         break;
     case 0x0F: // IF (FF0F)
         gb->if_ = data & 0x1F;
+        break;
+    case 0x10: // AUD1SWEEP/NR10 (FF10)
+        gb->ch1_sweep_time = GET_BITS(data, 4, 6);
+        gb->ch1_sweep_dir = GET_BIT(data, 3);
+        gb->ch1_sweep_shift = GET_BITS(data, 0, 2);
+        break;
+    case 0x11: // AUD1LEN/NR11 (FF11)
+        gb->ch1_duty = GET_BITS(data, 6, 7);
+        gb->ch1_len = (data & 0x3F) ^ 0x3F;
+        break;
+    case 0x12: // AUD1ENV/NR12 (FF12)
+        gb->ch1_env_init = GET_BITS(data, 4, 7);
+        gb->ch1_env_dir = GET_BIT(data, 3);
+        gb->ch1_env_sweep = GET_BITS(data, 0, 2);
+        break;
+    case 0x13: // AUD1LOW/NR13 (FF13)
+        gb->ch1_period = (gb->ch1_period & 0x700) | ~data;
+        break;
+    case 0x14: // AUD1HIGH/NR14 (FF14)
+        gb->ch1_active = GET_BIT(data, 7);
+        gb->ch1_len_en = GET_BIT(data, 6);
+        gb->ch1_period = (gb->ch1_period & 0xFF) | GET_BITS(~data, 0, 2) << 8;
+        break;
+    case 0x16: // AUD2LEN/NR21 (FF16)
+        gb->ch2_duty = GET_BITS(data, 6, 7);
+        gb->ch2_len = (data & 0x3F) ^ 0x3F;
+        break;
+    case 0x17: // AUD2ENV/NR22 (FF17)
+        gb->ch2_env_init = GET_BITS(data, 4, 7);
+        gb->ch2_env_dir = GET_BIT(data, 3);
+        gb->ch2_env_sweep = GET_BITS(data, 0, 2);
+        break;
+    case 0x18: // AUD2LOW/NR23 (FF18)
+        gb->ch2_period = (gb->ch2_period & 0x700) | ~data;
+        break;
+    case 0x19: // AUD2HIGH/NR24 (FF19)
+        gb->ch2_active = GET_BIT(data, 7);
+        gb->ch2_len_en = GET_BIT(data, 6);
+        gb->ch2_period = (gb->ch2_period & 0xFF) | GET_BITS(~data, 0, 2) << 8;
+        break;
+    case 0x1A: // AUD3ENA/NR30 (FF1A)
+        gb->ch3_dac = GET_BIT(data, 7);
+        break;
+    case 0x1B: // AUD3LEN/NR31 (FF1B)
+        gb->ch3_len = ~data;
+        break;
+    case 0x1C: // AUD3LEVEL/NR32 (FF1C)
+        gb->ch3_vol = GET_BITS(data, 5, 6);
+        break;
+    case 0x1D: // AUD3LOW/NR33 (FF1D)
+        gb->ch3_period = (gb->ch3_period & 0x700) | ~data;
+        break;
+    case 0x1E: // AUD3HIGH/NR34 (FF1E)
+        gb->ch3_active = GET_BIT(data, 7);
+        gb->ch3_len_en = GET_BIT(data, 6);
+        gb->ch3_period = (gb->ch3_period & 0xFF) | GET_BITS(~data, 0, 2) << 8;
+        break;
+    case 0x20: // AUD4LEN/NR41 (FF20)
+        gb->ch4_len = (data & 0x3F) ^ 0x3F;
+        break;
+    case 0x21: // AUD4ENV/NR42 (FF21)
+        gb->ch4_env_init = GET_BITS(data, 4, 7);
+        gb->ch4_env_dir = GET_BIT(data, 3);
+        gb->ch4_env_sweep = GET_BITS(data, 0, 2);
+        break;
+    case 0x22: // AUD4POLY/NR43 (FF22)
+        gb->ch4_shift = GET_BITS(data, 4, 7);
+        gb->ch4_width = GET_BIT(data, 3);
+        gb->ch4_divider = GET_BITS(data, 0, 2);
+        break;
+    case 0x23: // AUD4GO/NR44 (FF23)
+        gb->ch4_active = GET_BIT(data, 7);
+        gb->ch4_len_en = GET_BIT(data, 6);
+        break;
+    case 0x24: // AUDVOL/NR50 (FF24)
+        gb->vol_l = GET_BITS(data, 4, 6);
+        gb->vol_r = GET_BITS(data, 0, 2);
+        break;
+    case 0x25: // AUDTERM/NR51 (FF25)
+        gb->ch4_l = GET_BIT(data, 7);
+        gb->ch3_l = GET_BIT(data, 6);
+        gb->ch2_l = GET_BIT(data, 5);
+        gb->ch1_l = GET_BIT(data, 4);
+        gb->ch4_r = GET_BIT(data, 3);
+        gb->ch3_r = GET_BIT(data, 2);
+        gb->ch2_r = GET_BIT(data, 1);
+        gb->ch1_r = GET_BIT(data, 0);
+        break;
+    case 0x26: // AUDENA/NR52 (FF26)
+        gb->apu_on = GET_BIT(data, 7);
         break;
     case 0x40: // LCDC (FF40)
         gb->lcd_en = data & (1 << 7);
