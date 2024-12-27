@@ -110,11 +110,6 @@ void run_frame(GameBoy* gb) {
 u8 io_read(GameBoy* gb, u16 addr) {
     addr &= 0x7F;
 
-    // Audio registers
-    if (0x10 <= addr && addr <= 0x3f) {
-        return 0x00;
-    }
-
     switch (addr) {
     case 0x00: // P1 (FF00)
         return (gb->p1_get_dpad ? gb->input & 0xF : 0xF) &
@@ -130,9 +125,55 @@ u8 io_read(GameBoy* gb, u16 addr) {
     case 0x06: // TMA (FF06)
         return gb->tma;
     case 0x07: // TAC (FF07)
-        return (gb->tac_en << 2) | gb->tac_clk | 0xF8;
+        return gb->tac_en << 2 | gb->tac_clk | 0xF8;
     case 0x0F: // IF (FF0F)
         return gb->if_;
+    case 0x10: // AUD1SWEEP/NR10 (FF10)
+        return gb->ch1_sweep_time << 4 | gb->ch1_sweep_dir << 3 |
+               gb->ch1_sweep_shift;
+    case 0x11: // AUD1LEN/NR11 (FF11)
+        return gb->ch1_duty << 6;
+    case 0x12: // AUD1ENV/NR12 (FF12)
+        return gb->ch1_env_init << 4 | gb->ch1_env_dir << 3 | gb->ch1_env_sweep;
+    case 0x13: // AUD1LOW/NR13 (FF13)
+        return 0xFF;
+    case 0x14: // AUD1HIGH/NR14 (FF14)
+        return gb->ch1_len_en << 6;
+    case 0x16: // AUD2LEN/NR21 (FF16)
+        return gb->ch2_duty << 6;
+    case 0x17: // AUD2ENV/NR22 (FF17)
+        return gb->ch2_env_init << 4 | gb->ch2_env_dir << 3 | gb->ch2_env_sweep;
+    case 0x18: // AUD2LOW/NR23 (FF18)
+        return 0xFF;
+    case 0x19: // AUD2HIGH/NR24 (FF19)
+        return gb->ch2_len_en << 6;
+    case 0x1A: // AUD3ENA/NR30 (FF1A)
+        return gb->ch3_dac << 7;
+    case 0x1B: // AUD3LEN/NR31 (FF1B)
+        return 0xFF;
+    case 0x1C: // AUD3LEVEL/NR32 (FF1C)
+        return gb->ch3_vol << 5;
+    case 0x1D: // AUD3LOW/NR33 (FF1D)
+        return 0xFF;
+    case 0x1E: // AUD3HIGH/NR34 (FF1E)
+        return gb->ch3_len_en << 6;
+    case 0x20: // AUD4LEN/NR41 (FF20)
+        return 0xFF;
+    case 0x21: // AUD4ENV/NR42 (FF21)
+        return gb->ch4_env_init << 4 | gb->ch4_env_dir << 3 | gb->ch4_env_sweep;
+    case 0x22: // AUD4POLY/NR43 (FF22)
+        return gb->ch4_shift << 4 | gb->ch4_width << 3 | gb->ch4_divider;
+    case 0x23: // AUD4GO/NR44 (FF23)
+        return gb->ch4_len_en << 6;
+    case 0x24: // AUDVOL/NR50 (FF24)
+        return gb->vol_l << 4 | gb->vol_r;
+    case 0x25: // AUDTERM/NR51 (FF25)
+        return gb->ch4_l << 7 | gb->ch3_l << 6 | gb->ch2_l << 5 |
+               gb->ch1_l << 4 | gb->ch4_r << 3 | gb->ch3_r << 2 |
+               gb->ch2_r << 1 | gb->ch1_r;
+    case 0x26: // AUDENA/NR52 (FF26)
+        return gb->apu_on << 7 | gb->ch4_active << 3 | gb->ch3_active << 2 |
+               gb->ch2_active << 1 | gb->ch1_active;
     case 0x40: // LCDC (FF40)
         return (gb->lcd_en << 7) | (gb->win_map << 6) | (gb->win_en << 5) |
                (gb->tile_sel << 4) | (gb->bg_map << 3) | (gb->obj_size << 2) |

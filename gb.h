@@ -108,7 +108,8 @@ typedef struct GameBoy {
     u8 ch1_env_sweep; // Bits 0-2
     // AUD1LOW/NR13 (FF13)
     // AUD1HIGH/NR14 (FF14)
-    u16 ch1_period;  // NR13 bits 0-7, NR14 bits 0-2 (inverted)
+    u16 ch1_period; // NR13 bits 0-7, NR14 bits 0-2 (inverted)
+    u16 ch1_timer;
     bool ch1_active; // NR14 bit 7
     bool ch1_len_en; // NR14 bit 6
 
@@ -123,7 +124,8 @@ typedef struct GameBoy {
     u8 ch2_env_sweep; // Bits 0-2
     // AUD2LOW/NR23 (FF18)
     // AUD2HIGH/NR24 (FF19)
-    u16 ch2_period;  // NR23 bits 0-7, NR24 bits 0-2 (inverted)
+    u16 ch2_period; // NR23 bits 0-7, NR24 bits 0-2 (inverted)
+    u16 ch2_timer;
     bool ch2_active; // NR24 bit 7
     bool ch2_len_en; // NR24 bit 6
 
