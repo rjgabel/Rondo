@@ -1,4 +1,6 @@
 #include "cpu.h"
+
+#include "gb.h"
 #include "stdio.h"
 #include "stdlib.h"
 

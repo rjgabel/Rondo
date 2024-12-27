@@ -31,3 +31,5 @@
 #define ADD_HL_RR(RR) static void add_hl_##RR(GameBoy* gb) { gb->f_h = (gb->hl & 0xFFF) + (gb->RR & 0xFFF) > 0xFFF; gb->f_c = gb->hl + gb->RR > 0xFFFF; gb->hl += gb->RR; gb->f_n = 0; cycle(gb); }
 #define BIT_B_R(B, R) static void bit_##B##_##R(GameBoy* gb) { gb->f_z = !(gb->R & (1 << B)); gb->f_n = 0; gb->f_h = 1; }
 #define CALL_CC_NN(CC, COND) static void call_##CC##_nn(GameBoy* gb) { u16 nn = read_imm_cycle16(gb); if (COND) { push_cycle16(gb, gb->pc); gb->pc = nn; } }
+#define LD_HL_R(R) static void ld_hl_##R(GameBoy* gb) { write_cycle(gb, gb->hl, gb->R); }
+#define DEC_R(R) static void dec_##R(GameBoy* gb) { gb->R--; gb->f_z = !gb->R; gb->f_n = 1; gb->f_h = (gb->R & 0xF) == 0xF; }

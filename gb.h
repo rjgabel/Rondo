@@ -40,7 +40,7 @@ typedef int16_t s16;
 
 typedef enum { DMG, SGB, CGB } GBType;
 
-typedef struct {
+typedef struct GameBoy {
     GBType type;
     void* fbuf;
     bool end_frame;

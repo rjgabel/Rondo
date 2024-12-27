@@ -1,8 +1,6 @@
 #ifndef RONDO_LCD_H
 #define RONDO_LCD_H
 
-#include "gb.h"
-
-void lcd_cycle(GameBoy* gb);
+void lcd_cycle(struct GameBoy* gb);
 
 #endif

@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="apu.h" />
     <ClInclude Include="cpu.h" />
     <ClInclude Include="gb.h" />
     <ClInclude Include="lcd.h" />
     <ClInclude Include="libretro.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="apu.c" />
     <ClCompile Include="cpu.c" />
     <ClCompile Include="gb.c" />
     <ClCompile Include="ldc.c" />

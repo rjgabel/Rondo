@@ -1,4 +1,6 @@
 #include "lcd.h"
+
+#include "gb.h"
 #include "stdio.h"
 
 u32 colors[4] = {0xFFFFFF, 0xAAAAAA, 0x555555, 0x000000};
@@ -70,6 +72,7 @@ void lcd_cycle(GameBoy* gb) {
     }
 
     if (gb->ly < SCREEN_HEIGHT && gb->dots < SCREEN_WIDTH && gb->dots >= 0) {
-        render_pixel(gb, gb->dots, gb->ly);
+        // Cast is safe, check ensures that dots will always be in u8 range
+        render_pixel(gb, (u8)gb->dots, gb->ly);
     }
 }
