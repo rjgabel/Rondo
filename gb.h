@@ -94,6 +94,8 @@ typedef struct GameBoy {
     // Audio stuff
 
     // Channel 1
+    u16 ch1_timer;
+    u8 ch1_index;
     bool ch1_dac;
     // AUD1SWEEP/NR10 (FF10)
     u8 ch1_sweep_time;  // Bits 4-6
@@ -108,12 +110,13 @@ typedef struct GameBoy {
     u8 ch1_env_sweep; // Bits 0-2
     // AUD1LOW/NR13 (FF13)
     // AUD1HIGH/NR14 (FF14)
-    u16 ch1_period; // NR13 bits 0-7, NR14 bits 0-2 (inverted)
-    u16 ch1_timer;
+    u16 ch1_period;  // NR13 bits 0-7, NR14 bits 0-2 (inverted)
     bool ch1_active; // NR14 bit 7
     bool ch1_len_en; // NR14 bit 6
 
     // Channel 2
+    u16 ch2_timer;
+    u8 ch2_index;
     bool ch2_dac;
     // AUD2LEN/NR21 (FF16)
     u8 ch2_duty; // Bits 6-7
@@ -124,8 +127,7 @@ typedef struct GameBoy {
     u8 ch2_env_sweep; // Bits 0-2
     // AUD2LOW/NR23 (FF18)
     // AUD2HIGH/NR24 (FF19)
-    u16 ch2_period; // NR23 bits 0-7, NR24 bits 0-2 (inverted)
-    u16 ch2_timer;
+    u16 ch2_period;  // NR23 bits 0-7, NR24 bits 0-2 (inverted)
     bool ch2_active; // NR24 bit 7
     bool ch2_len_en; // NR24 bit 6
 
@@ -173,7 +175,10 @@ typedef struct GameBoy {
     bool ch1_r; // Bit 0
 
     // AUDENA/NR52 (FF26)
-    bool apu_on; // Bit 7
+    bool apu_en; // Bit 7
+
+    // FF30-FF3F
+    u8 wave_ram[32];
 
     // LCDC (FF40)
     bool lcd_en;   // Bit 7
@@ -216,5 +221,8 @@ u8 read(GameBoy* gb, u16 addr);
 void write(GameBoy* gb, u16 addr, u8 data);
 
 void cycle(GameBoy* gb);
+
+// Defined in libretro.c
+void play_sample(s16 l, s16 r);
 
 #endif

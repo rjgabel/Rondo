@@ -1,5 +1,6 @@
 #include "gb.h"
 
+#include "apu.h"
 #include "cpu.h"
 #include "lcd.h"
 #include "stdio.h"
@@ -110,6 +111,12 @@ void run_frame(GameBoy* gb) {
 u8 io_read(GameBoy* gb, u16 addr) {
     addr &= 0x7F;
 
+    // Wave RAM
+    if (addr >= 0x30 && addr <= 0x3f) {
+        u8 index = (addr - 0x30) * 2;
+        return gb->wave_ram[index] << 4 | gb->wave_ram[index + 1];
+    }
+
     switch (addr) {
     case 0x00: // P1 (FF00)
         return (gb->p1_get_dpad ? gb->input & 0xF : 0xF) &
@@ -172,7 +179,7 @@ u8 io_read(GameBoy* gb, u16 addr) {
                gb->ch1_l << 4 | gb->ch4_r << 3 | gb->ch3_r << 2 |
                gb->ch2_r << 1 | gb->ch1_r;
     case 0x26: // AUDENA/NR52 (FF26)
-        return gb->apu_on << 7 | gb->ch4_active << 3 | gb->ch3_active << 2 |
+        return gb->apu_en << 7 | gb->ch4_active << 3 | gb->ch3_active << 2 |
                gb->ch2_active << 1 | gb->ch1_active;
     case 0x40: // LCDC (FF40)
         return (gb->lcd_en << 7) | (gb->win_map << 6) | (gb->win_en << 5) |
@@ -209,14 +216,17 @@ u8 io_read(GameBoy* gb, u16 addr) {
     }
 }
 
-#define GET_BITS(value, lo, hi) ((value) >> (lo) & (1 << (hi) - (lo) + 1) - 1)
+#define GET_BITS(value, lo, hi) ((value) >> (lo) & (1 << ((hi) - (lo) + 1)) - 1)
 #define GET_BIT(value, b) ((value) >> (b) & 1)
 
 void io_write(GameBoy* gb, u16 addr, u8 data) {
     addr &= 0x7F;
 
-    // Audio registers
-    if (0x10 <= addr && addr <= 0x3f) {
+    // Wave RAM
+    if (addr >= 0x30 && addr <= 0x3f) {
+        u8 index = (addr - 0x30) * 2;
+        gb->wave_ram[index] = GET_BITS(data, 4, 7);
+        gb->wave_ram[index + 1] = GET_BITS(data, 0, 3);
         return;
     }
 
@@ -335,7 +345,7 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->ch1_r = GET_BIT(data, 0);
         break;
     case 0x26: // AUDENA/NR52 (FF26)
-        gb->apu_on = GET_BIT(data, 7);
+        gb->apu_en = GET_BIT(data, 7);
         break;
     case 0x40: // LCDC (FF40)
         gb->lcd_en = data & (1 << 7);
@@ -471,5 +481,8 @@ void cycle(GameBoy* gb) {
         for (int i = 0; i < 4; i++) {
             lcd_cycle(gb);
         }
+    }
+    if (gb->apu_en) {
+        render_audio_sample(gb);
     }
 }

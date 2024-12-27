@@ -5,6 +5,7 @@ GameBoy* gb;
 
 static retro_environment_t environ_cb;
 static retro_video_refresh_t video_cb;
+static retro_audio_sample_t audio_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 
@@ -17,7 +18,7 @@ void retro_set_environment(retro_environment_t cb) {
 
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
 
-void retro_set_audio_sample(retro_audio_sample_t cb) {}
+void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) {}
 
@@ -47,7 +48,7 @@ void retro_get_system_av_info(struct retro_system_av_info* info) {
     info->geometry.aspect_ratio = 0; // Interpreted as base_width/base_height
 
     info->timing.fps = FRAME_RATE;
-    info->timing.sample_rate = 48000.0; // Placeholder
+    info->timing.sample_rate = 1048576.0; // Placeholder
 }
 
 void retro_set_controller_port_device(unsigned port, unsigned device) {}
@@ -122,3 +123,6 @@ unsigned retro_get_region(void) { return 0; }
 void* retro_get_memory_data(unsigned id) { return NULL; }
 
 size_t retro_get_memory_size(unsigned id) { return 0; }
+
+// Used in apu.c
+void play_sample(s16 l, s16 r) { audio_cb(l, r); }
