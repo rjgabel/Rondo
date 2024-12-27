@@ -2,50 +2,50 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-u8 read_cycle(GameBoy* gb, u16 addr) {
+static u8 read_cycle(GameBoy* gb, u16 addr) {
     u8 data = read(gb, addr);
     cycle(gb);
     return data;
 }
-u8 read_imm_cycle(GameBoy* gb) { return read_cycle(gb, gb->pc++); }
-u16 read_cycle16(GameBoy* gb, u16 addr) {
+static u8 read_imm_cycle(GameBoy* gb) { return read_cycle(gb, gb->pc++); }
+static u16 read_cycle16(GameBoy* gb, u16 addr) {
     u8 lo = read_cycle(gb, addr);
     u8 hi = read_cycle(gb, addr + 1);
     return (hi << 8) + lo;
 }
-u16 read_imm_cycle16(GameBoy* gb) {
+static u16 read_imm_cycle16(GameBoy* gb) {
     u8 lo = read_imm_cycle(gb);
     u8 hi = read_imm_cycle(gb);
     return (hi << 8) + lo;
 }
 
-void write_cycle(GameBoy* gb, u16 addr, u8 data) {
+static void write_cycle(GameBoy* gb, u16 addr, u8 data) {
     write(gb, addr, data);
     cycle(gb);
 }
-void write_cycle16(GameBoy* gb, u16 addr, u16 data) {
+static void write_cycle16(GameBoy* gb, u16 addr, u16 data) {
     write_cycle(gb, addr, data & 0xFF);
     write_cycle(gb, addr + 1, data >> 8);
 }
 
 // Pre-decrement is intentional and important
 // Also note that this takes 3 cycles instead of 2
-void push_cycle16(GameBoy* gb, u16 data) {
+static void push_cycle16(GameBoy* gb, u16 data) {
     cycle(gb);
     write_cycle(gb, --gb->sp, data >> 8);
     write_cycle(gb, --gb->sp, data & 0xFF);
 }
-u16 pop_cycle16(GameBoy* gb) {
+static u16 pop_cycle16(GameBoy* gb) {
     u8 lo = read_cycle(gb, gb->sp++);
     u8 hi = read_cycle(gb, gb->sp++);
     return (hi << 8) + lo;
 }
 
-u16 get_af(GameBoy* gb) {
+static u16 get_af(GameBoy* gb) {
     return (gb->a << 8) + (gb->f_z << 7) + (gb->f_n << 6) + (gb->f_h << 5) +
            (gb->f_c << 4);
 }
-void set_af(GameBoy* gb, u16 af) {
+static void set_af(GameBoy* gb, u16 af) {
     gb->a = af >> 8;
     gb->f_z = af & (1 << 7);
     gb->f_n = af & (1 << 6);

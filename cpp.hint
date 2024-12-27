@@ -26,3 +26,8 @@
 #define DEF_BIT_REG(OP, B) OP(B, a) OP(B, b) OP(B, c) OP(B, d) OP(B, e) OP(B, h) OP(B, l)
 #define JP_CC_NN(CC, COND) static void jp_##CC##_nn(GameBoy* gb) { u16 nn = read_imm_cycle16(gb); if (COND) { gb->pc = nn; cycle(gb); } }
 #define RST_N(N) static void rst_##N(GameBoy* gb) { push_cycle16(gb, gb->pc); gb->pc = N; }
+#define LD_R_HL(R) static void ld_##R##_hl(GameBoy* gb) { gb->R = read_cycle(gb, gb->hl); }
+#define INC_R(R) static void inc_##R(GameBoy* gb) { gb->R++; gb->f_z = !gb->R; gb->f_n = 0; gb->f_h = !(gb->R & 0xF); }
+#define ADD_HL_RR(RR) static void add_hl_##RR(GameBoy* gb) { gb->f_h = (gb->hl & 0xFFF) + (gb->RR & 0xFFF) > 0xFFF; gb->f_c = gb->hl + gb->RR > 0xFFFF; gb->hl += gb->RR; gb->f_n = 0; cycle(gb); }
+#define BIT_B_R(B, R) static void bit_##B##_##R(GameBoy* gb) { gb->f_z = !(gb->R & (1 << B)); gb->f_n = 0; gb->f_h = 1; }
+#define CALL_CC_NN(CC, COND) static void call_##CC##_nn(GameBoy* gb) { u16 nn = read_imm_cycle16(gb); if (COND) { push_cycle16(gb, gb->pc); gb->pc = nn; } }
