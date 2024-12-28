@@ -146,6 +146,9 @@ typedef struct GameBoy {
     bool ch3_len_en; // NR34 bit 6
 
     // Channel 4
+    u32 ch4_timer;
+    u32 ch4_period;
+    u16 ch4_lfsr;
     bool ch4_dac;
     bool ch4_active;
     // AUD4LEN/NR41 (FF20)

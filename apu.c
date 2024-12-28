@@ -38,13 +38,31 @@ static u8 ch3_get_sample(GameBoy* gb) {
     return sample;
 }
 
+static u8 ch4_get_sample(GameBoy* gb) {
+    if (!gb->ch4_timer--) {
+        gb->ch4_timer = gb->ch4_period;
+        // Clock LFSR
+        bool new_bit = (gb->ch4_lfsr & 1) == (gb->ch4_lfsr >> 1 & 1);
+        gb->ch4_lfsr =
+            new_bit ? (gb->ch4_lfsr | 0x8000) : (gb->ch4_lfsr & 0x7FFF);
+        if (gb->ch4_width) {
+            gb->ch4_lfsr =
+                new_bit ? (gb->ch4_lfsr | 0x0080) : (gb->ch4_lfsr & 0xFF7F);
+        }
+        gb->ch4_lfsr >>= 1;
+    }
+    return (gb->ch4_lfsr & 1) ? gb->ch4_env_init : 0;
+}
+
 void render_audio_sample(GameBoy* gb) {
     u8 ch1_sample = gb->ch1_active ? ch1_get_sample(gb) : 0;
     u8 ch2_sample = gb->ch2_active ? ch2_get_sample(gb) : 0;
     u8 ch3_sample =
         gb->ch3_active ? (ch3_get_sample(gb), ch3_get_sample(gb)) : 0;
+    u8 ch4_sample = gb->ch4_active ? ch4_get_sample(gb) : 0;
 
-    s16 converted = 0x7FFF - (ch1_sample + ch2_sample + ch3_sample) * 0x5B0;
+    s16 converted =
+        0x7FFF - (ch1_sample + ch2_sample + ch3_sample + ch4_sample) * 0x444;
     play_sample(converted, converted);
 }
 
@@ -69,5 +87,15 @@ void ch3_trigger(GameBoy* gb) {
 void ch4_trigger(GameBoy* gb) {
     if (gb->ch4_dac) {
         gb->ch4_active = true;
+        gb->ch4_lfsr = 0;
     }
+}
+
+void update_ch4_period(GameBoy* gb) {
+    u32 period = gb->ch4_divider << 2;
+    if (period == 0) {
+        period = 2;
+    }
+    period << gb->ch4_shift;
+    gb->ch4_period = period;
 }

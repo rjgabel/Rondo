@@ -355,6 +355,7 @@ void io_write(GameBoy* gb, u16 addr, u8 data) {
         gb->ch4_shift = GET_BITS(data, 4, 7);
         gb->ch4_width = GET_BIT(data, 3);
         gb->ch4_divider = GET_BITS(data, 0, 2);
+        update_ch4_period(gb);
         break;
     case 0x23: // AUD4GO/NR44 (FF23)
         gb->ch4_len_en = GET_BIT(data, 6);

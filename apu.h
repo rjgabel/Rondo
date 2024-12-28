@@ -6,5 +6,6 @@ void ch1_trigger(struct GameBoy* gb);
 void ch2_trigger(struct GameBoy* gb);
 void ch3_trigger(struct GameBoy* gb);
 void ch4_trigger(struct GameBoy* gb);
+void update_ch4_period(struct GameBoy* gb);
 
 #endif
