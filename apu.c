@@ -41,7 +41,8 @@ static u8 ch3_get_sample(GameBoy* gb) {
 void render_audio_sample(GameBoy* gb) {
     u8 ch1_sample = gb->ch1_active ? ch1_get_sample(gb) : 0;
     u8 ch2_sample = gb->ch2_active ? ch2_get_sample(gb) : 0;
-    u8 ch3_sample = gb->ch3_active ? ch3_get_sample(gb) : 0;
+    u8 ch3_sample =
+        gb->ch3_active ? (ch3_get_sample(gb), ch3_get_sample(gb)) : 0;
 
     s16 converted = 0x7FFF - (ch1_sample + ch2_sample + ch3_sample) * 0x5B0;
     play_sample(converted, converted);
