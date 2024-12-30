@@ -35,3 +35,6 @@
 #define DEC_R(R) static void dec_##R(GameBoy* gb) { gb->R--; gb->f_z = !gb->R; gb->f_n = 1; gb->f_h = (gb->R & 0xF) == 0xF; }
 #define bool
 #define GET_BIT(value, b) ((value) >> (b) & 1)
+#define true
+#define RET_CC(CC, COND) static void ret_##CC(GameBoy* gb) { cycle(gb); if (COND) { gb->pc = pop_cycle16(gb); cycle(gb); } }
+#define JR_CC_E(CC, COND) static void jr_##CC##_e(GameBoy* gb) { s8 e = read_imm_cycle(gb); if (COND) { gb->pc += e; cycle(gb); } }

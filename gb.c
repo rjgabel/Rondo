@@ -517,4 +517,7 @@ void cycle(GameBoy* gb) {
     if (gb->apu_en) {
         render_audio_sample(gb);
     }
+
+    // Divider register stuff
+    gb->div += 4;
 }
