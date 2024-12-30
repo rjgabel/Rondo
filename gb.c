@@ -519,5 +519,14 @@ void cycle(GameBoy* gb) {
     }
 
     // Divider register stuff
+    static const u16 TICK_MASKS[4] = {0x03FF, 0x000F, 0x003F, 0x00FF};
     gb->div += 4;
+    if (!(gb->div & TICK_MASKS[gb->tac_clk]) && gb->tac_en) {
+        // Timer tick
+        gb->tima++;
+        if (!gb->tima) {
+            gb->tima = gb->tma;
+            gb->if_ |= (1 << 2);
+        }
+    }
 }
