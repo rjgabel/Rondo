@@ -529,4 +529,7 @@ void cycle(GameBoy* gb) {
             gb->if_ |= (1 << 2);
         }
     }
+    if ((gb->div & 0x1FFF) && gb->apu_en) {
+        div_apu_event(gb);
+    }
 }

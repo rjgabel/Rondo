@@ -92,6 +92,7 @@ typedef struct GameBoy {
     u8 if_; // FF0F
 
     // Audio stuff
+    u8 div_apu_counter;
 
     // Channel 1
     u16 ch1_timer;
@@ -105,6 +106,7 @@ typedef struct GameBoy {
     // AUD1LEN/NR11 (FF11)
     u8 ch1_duty; // Bits 6-7
     u8 ch1_len;  // Bits 0-5 (inverted)
+    u8 ch1_len_ctr;
     // AUD1ENV/NR12 (FF12)
     u8 ch1_env_init;  // Bits 4-7
     bool ch1_env_dir; // Bit 3
@@ -122,6 +124,7 @@ typedef struct GameBoy {
     // AUD2LEN/NR21 (FF16)
     u8 ch2_duty; // Bits 6-7
     u8 ch2_len;  // Bits 0-5 (inverted)
+    u8 ch2_len_ctr;
     // AUD2ENV/NR22 (FF17)
     u8 ch2_env_init;  // Bits 4-7
     bool ch2_env_dir; // Bit 3
@@ -138,6 +141,7 @@ typedef struct GameBoy {
     bool ch3_active;
     // AUD3LEN/NR31 (FF1B)
     u8 ch3_len; // Bits 0-7 (inverted)
+    u8 ch3_len_ctr;
     // AUD3LEVEL/NR32 (FF1C)
     u8 ch3_vol; // Bits 5-6
     // AUD3LOW/NR33 (FF1D)
@@ -153,6 +157,7 @@ typedef struct GameBoy {
     bool ch4_active;
     // AUD4LEN/NR41 (FF20)
     u8 ch4_len; // Bits 0-5 (inverted)
+    u8 ch4_len_ctr;
     // AUD4ENV/NR42 (FF21)
     u8 ch4_env_init;  // Bits 4-7
     bool ch4_env_dir; // Bit 3

@@ -7,5 +7,6 @@ void ch2_trigger(struct GameBoy* gb);
 void ch3_trigger(struct GameBoy* gb);
 void ch4_trigger(struct GameBoy* gb);
 void update_ch4_period(struct GameBoy* gb);
+void div_apu_event(struct GameBoy* gb);
 
 #endif

@@ -69,18 +69,27 @@ void render_audio_sample(GameBoy* gb) {
 void ch1_trigger(GameBoy* gb) {
     if (gb->ch1_dac) {
         gb->ch1_active = true;
+        if (!gb->ch1_len_ctr) {
+            gb->ch1_len_ctr = gb->ch1_len;
+        }
     }
 }
 
 void ch2_trigger(GameBoy* gb) {
     if (gb->ch2_dac) {
         gb->ch2_active = true;
+        if (!gb->ch2_len_ctr) {
+            gb->ch2_len_ctr = gb->ch2_len;
+        }
     }
 }
 
 void ch3_trigger(GameBoy* gb) {
     if (gb->ch3_dac) {
         gb->ch3_active = true;
+        if (!gb->ch3_len_ctr) {
+            gb->ch3_len_ctr = gb->ch3_len;
+        }
     }
 }
 
@@ -88,6 +97,9 @@ void ch4_trigger(GameBoy* gb) {
     if (gb->ch4_dac) {
         gb->ch4_active = true;
         gb->ch4_lfsr = 0;
+        if (!gb->ch4_len_ctr) {
+            gb->ch4_len_ctr = gb->ch4_len;
+        }
     }
 }
 
@@ -98,4 +110,32 @@ void update_ch4_period(GameBoy* gb) {
     }
     period << gb->ch4_shift;
     gb->ch4_period = period;
+}
+
+#define UPDATE_LENGTH(c)                                                       \
+    {                                                                          \
+        if (gb->ch##c##_active && gb->ch##c##_len_en) {                        \
+            gb->ch##c##_len_ctr++;                                             \
+            if (!gb->ch##c##_len_ctr) {                                        \
+                gb->ch##c##_active = false;                                    \
+            }                                                                  \
+        }                                                                      \
+    }
+
+void div_apu_event(GameBoy* gb) {
+    gb->div_apu_counter++;
+    gb->div_apu_counter &= 7;
+    if (!(gb->div_apu_counter & 7)) {
+        // Envelope sweep
+    }
+    if (!(gb->div_apu_counter & 3)) {
+        // CH1 freq sweep
+    }
+    if (!(gb->div_apu_counter & 1)) {
+        // Sound length
+        UPDATE_LENGTH(1);
+        UPDATE_LENGTH(2);
+        UPDATE_LENGTH(3);
+        UPDATE_LENGTH(4);
+    }
 }
