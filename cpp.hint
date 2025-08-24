@@ -1,0 +1,40 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define RETRO_API RETRO_CALLCONV __attribute__((__dllimport__))
+#define RETRO_API RETRO_CALLCONV __declspec(dllimport)
+#define RETRO_API RETRO_CALLCONV __attribute__((__dllexport__))
+#define RETRO_API RETRO_CALLCONV __declspec(dllexport)
+#define RETRO_API RETRO_CALLCONV __attribute__((__visibility__("default")))
+#define RETRO_API
+#define REG_DEF(HI, LO) union { u16 HI##LO; struct { u8 HI, LO; }; };
+#define REG_DEF(HI, LO) union { u16 HI##LO; struct { u8 LO, HI; }; };
+#define POP_RR(RR) static void pop_##RR(GameBoy* gb) { gb->RR = pop_cycle16(gb); }
+#define DEF_ALL_REG16(MACRO) MACRO(bc) MACRO(de) MACRO(hl)
+#define RETRO_DEVICE_ID_JOYPAD_RIGHT
+#define DEF_CB_OP(OP) CB_REG_OP(OP, a) CB_REG_OP(OP, b) CB_REG_OP(OP, c) CB_REG_OP(OP, d) CB_REG_OP(OP, e) CB_REG_OP(OP, h) CB_REG_OP(OP, l) CB_HL_OP(OP)
+#define DEF_ALL_COND(MACRO) MACRO(z, gb->f_z) MACRO(nz, !gb->f_z) MACRO(c, gb->f_c) MACRO(nc, !gb->f_c)
+#define RES_B_HL(B) static void res_##B##_hl(GameBoy* gb) { u8 data = read_cycle(gb, gb->hl); data &= ~(1 << B); write_cycle(gb, gb->hl, data); }
+#define INC_RR(RR) static void inc_##RR(GameBoy* gb) { gb->RR++; cycle(gb); }
+#define LD_R_R(R1, R2) static void ld_##R1##_##R2(GameBoy* gb) { gb->R1 = gb->R2; }
+#define LD_RR_NN(RR) static void ld_##RR##_nn(GameBoy* gb) { u16 nn = read_imm_cycle16(gb); gb->RR = nn; }
+#define DEF_ALL_REG(MACRO) MACRO(a) MACRO(b) MACRO(c) MACRO(d) MACRO(e) MACRO(h) MACRO(l)
+#define LD_R_N(R) static void ld_##R##_n(GameBoy* gb) { gb->R = read_imm_cycle(gb); }
+#define PUSH_RR(RR) static void push_##RR(GameBoy* gb) { push_cycle16(gb, gb->RR); }
+#define DEF_ALU_OP(OP) ALU_REG_OP(OP, a) ALU_REG_OP(OP, b) ALU_REG_OP(OP, c) ALU_REG_OP(OP, d) ALU_REG_OP(OP, e) ALU_REG_OP(OP, h) ALU_REG_OP(OP, l) ALU_HL_OP(OP) ALU_IMM_OP(OP)
+#define DEC_RR(RR) static void dec_##RR(GameBoy* gb) { gb->RR--; cycle(gb); }
+#define DEF_BIT_REG(OP, B) OP(B, a) OP(B, b) OP(B, c) OP(B, d) OP(B, e) OP(B, h) OP(B, l)
+#define JP_CC_NN(CC, COND) static void jp_##CC##_nn(GameBoy* gb) { u16 nn = read_imm_cycle16(gb); if (COND) { gb->pc = nn; cycle(gb); } }
+#define RST_N(N) static void rst_##N(GameBoy* gb) { push_cycle16(gb, gb->pc); gb->pc = N; }
+#define LD_R_HL(R) static void ld_##R##_hl(GameBoy* gb) { gb->R = read_cycle(gb, gb->hl); }
+#define INC_R(R) static void inc_##R(GameBoy* gb) { gb->R++; gb->f_z = !gb->R; gb->f_n = 0; gb->f_h = !(gb->R & 0xF); }
+#define ADD_HL_RR(RR) static void add_hl_##RR(GameBoy* gb) { gb->f_h = (gb->hl & 0xFFF) + (gb->RR & 0xFFF) > 0xFFF; gb->f_c = gb->hl + gb->RR > 0xFFFF; gb->hl += gb->RR; gb->f_n = 0; cycle(gb); }
+#define BIT_B_R(B, R) static void bit_##B##_##R(GameBoy* gb) { gb->f_z = !(gb->R & (1 << B)); gb->f_n = 0; gb->f_h = 1; }
+#define CALL_CC_NN(CC, COND) static void call_##CC##_nn(GameBoy* gb) { u16 nn = read_imm_cycle16(gb); if (COND) { push_cycle16(gb, gb->pc); gb->pc = nn; } }
+#define LD_HL_R(R) static void ld_hl_##R(GameBoy* gb) { write_cycle(gb, gb->hl, gb->R); }
+#define DEC_R(R) static void dec_##R(GameBoy* gb) { gb->R--; gb->f_z = !gb->R; gb->f_n = 1; gb->f_h = (gb->R & 0xF) == 0xF; }
+#define bool
+#define GET_BIT(value, b) ((value) >> (b) & 1)
+#define true
+#define RET_CC(CC, COND) static void ret_##CC(GameBoy* gb) { cycle(gb); if (COND) { gb->pc = pop_cycle16(gb); cycle(gb); } }
+#define JR_CC_E(CC, COND) static void jr_##CC##_e(GameBoy* gb) { s8 e = read_imm_cycle(gb); if (COND) { gb->pc += e; cycle(gb); } }
