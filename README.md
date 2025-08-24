@@ -1,6 +1,6 @@
 # Rondo
 
-**Game Boy emulator written in C** - a personal, in-progress project striving for clarity, accuracy, and fun.
+**Game Boy emulator written in C** - a personal, in-progress project striving for clarity, accuracy, and fun. Runs Tetris.
 
 <br>
 
